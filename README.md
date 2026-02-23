@@ -29,7 +29,7 @@ Another thing this script can do is to forward messages to an telegram-bot. I us
 - do not use a bot if your neigbour uses a bot
 - do not connect yout bot to many channels
 - allways use scopes on bot and regions on your repeaters
-- limit traffic by setting small a hop-limit for trigger an setting a small scope
+- limit traffic by setting a small hop-limit for trigger and setting a small scope to your channels
 - if you see your bot is causing a lot of traffic: stop it, set smaller scope and reduce hop-limit
 
 ## using from CLI
