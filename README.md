@@ -1,8 +1,10 @@
 # meshcore_bot
 another anoying meshcore ping-bot
 
+**WE DO NOT NEED MORE BOTS - BUT WE NEED BOTS WHICH CAN SCOPE !!!**
+
 ## what it will do
-This bot is used to react on single keyword in one or more channels setup on your companion-radion connected by serial or tcp-connection.
+This bot is used to react on single keyword in one or more channels setup on your companion-radio connected by serial or tcp-connection.
 
 It supports
 - channels and direct messages
