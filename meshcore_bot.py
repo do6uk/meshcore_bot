@@ -18,7 +18,7 @@ import packet_hash	# from local directory
 ## GLOBAL CONSTS
 
 APP = "MeshCore Ping-Bot"
-VERSION = "1.4"
+VERSION = "1.5"
 
 ROUTE_TYPENAMES = ["TC_FLOOD", "FLOOD", "DIRECT", "TC_DIRECT"]
 PAYLOAD_TYPENAMES = ["REQ", "RESPONSE", "TEXT_MSG", "ACK", "ADVERT", "GRP_TXT", "GRP_DATA", "ANON_REQ", "PATH", "TRACE", "MULTIPART", "CONTROL"]
@@ -38,6 +38,7 @@ class config:
 	
 	connection = False
 	port = False
+	ping_timeout = 30
 	
 	ping_chan_active = True
 	ping_channels = ['#ping']
@@ -75,6 +76,7 @@ class config:
 		self.parser.add_section('telegrambot.relay')
 		
 		self.parser.set('DEFAULT','log_level', logging.getLevelName(self.log_level))
+		self.parser.set('DEFAULT', 'ping_timeout', str(self.ping_timeout))
 		
 		self.parser.set('device','connection', str(self.connection))
 		self.parser.set('device','port', str(self.port))
@@ -114,6 +116,7 @@ class config:
 		log_levels = logging.getLevelNamesMapping()
 		if temp_log_level in log_levels:
 			self.log_level = log_levels[temp_log_level]
+		self.ping_timeout = self.parser.getint('DEFAULT', 'ping_timeout', fallback = self.ping_timeout)
 		
 		self.connection = self.parser.get('device','connection', fallback = self.connection).lower()
 		self.port = self.parser.get('device','port', fallback = self.port)
@@ -304,6 +307,10 @@ async def main():
 			ping_sent = msg['sender_timestamp']
 			ping_diff = str(int(time.time()-ping_sent))
 			
+			if ping_diff > conf.ping_timeout:
+				bot_logger.info(f"[ping_bot] {msg_from} max duration reached {ping_diff} > {conf.ping_timeout} - exit ...")
+				return
+			
 			ping_msg = conf.ping_priv_message
 			ping_msg = ping_msg.replace('\\n', '\n')
 			ping_msg = ping_msg.replace('{time}', str(msg_received))
@@ -373,6 +380,10 @@ async def main():
 			ping_sent = msg['sender_timestamp']
 			ping_diff = int(time.time()-ping_sent)
 			
+			if ping_diff > conf.ping_timeout:
+				bot_logger.info(f"[ping_bot] {msg_contact} max duration reached {ping_diff} > {conf.ping_timeout} - exit ...")
+				return
+			
 			if ping_hops == 255:
 				ping_hops = 0
 			
@@ -433,7 +444,7 @@ async def main():
 			ping_msg_len = len(ping_msg)
 			
 			bot_logger.info(f"[ping_bot] responds:\n {ping_msg} {ping_msg_len}/122 {ping_scope_msg}")
-			time.sleep(2)
+			time.sleep(1)
 			result_scope = await meshcore.commands.set_flood_scope('#'+ping_scope)
 			time.sleep(0.5)
 			result_msg = await meshcore.commands.send_chan_msg(channel_idx, ping_msg)
